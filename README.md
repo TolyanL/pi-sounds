@@ -45,7 +45,7 @@ pi install git:github.com/TolyanL/pi-sounds
 Pin a tag or commit:
 
 ```sh
-pi install git:github.com/TolyanL/pi-sounds@v0.1.0
+pi install git:github.com/TolyanL/pi-sounds@v1.0.0
 ```
 
 Try it for a single invocation without touching your settings:
