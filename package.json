@@ -1,0 +1,35 @@
+{
+  "name": "pi-sounds",
+  "version": "0.1.0",
+  "description": "Notification sounds for Pi: done, error, question, and aborted events",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "notifications",
+    "sounds",
+    "audio"
+  ],
+  "license": "MIT",
+  "author": "TolyanL",
+  "homepage": "https://github.com/TolyanL/pi-sounds#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TolyanL/pi-sounds.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TolyanL/pi-sounds/issues"
+  },
+  "files": [
+    "index.ts",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  }
+}

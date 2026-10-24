@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "player": "auto",
+  "volume": 0.8,
+  "cooldownMs": 1000,
+  "stopPrevious": true,
+  "soundsDir": "~/.pi/sounds",
+  "leadInMs": "auto",
+  "bluetoothLeadInMs": 400,
+  "events": {
+    "done": { "enabled": true, "sound": "done", "volume": 0.7 },
+    "error": { "enabled": true, "sound": "error", "volume": 0.9 },
+    "question": { "enabled": true, "sound": "question", "volume": 0.8 },
+    "aborted": { "enabled": true, "sound": "aborted", "volume": 0.7 }
+  },
+  "question": {
+    "tools": ["ask_user_question"],
+    "uiPrompts": false,
+    "eventChannels": ["rpiv:ask-user:blocked"]
+  },
+  "errors": {
+    "stopReasons": ["error"]
+  }
+}
