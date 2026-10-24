@@ -1,10 +1,21 @@
 # pi-sounds
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Pi extension](https://img.shields.io/badge/pi-extension-blueviolet.svg)](https://pi.dev)
 
 Notification sounds for [Pi](https://pi.dev): know when a run finishes, fails, asks you something, or gets interrupted — without watching the terminal.
 
 Works on Linux, macOS, and anywhere Pi runs. Uses whatever audio player is already installed and falls back to the terminal bell, so it never becomes a hard dependency.
+
+## Features
+
+- **Four events** — `done`, `error`, `question`, and `aborted`, each with its own sound file and volume.
+- **Settled, not ended** — the extension hooks `agent_settled`, so retries and queued continuations never announce a run that is still in flight.
+- **Player autodetection** — picks the first working binary from `pw-play`, `paplay`, `ffplay`, `mpv`, `aplay`, `afplay`; `cvlc` and `bell` are available by name.
+- **Per-event rules** — sound name or path, volume, player, and an on/off switch for every event, with a cooldown against repeats.
+- **Bluetooth lead-in** — prepends digital silence so a sleeping A2DP sink does not clip the first hit; generated once and cached.
+- **Bell fallback** — a missing player or sound file degrades to the terminal bell and never blocks a run.
+- **Config layering** — env var, project, then global file; `/sounds on|off` and `--no-sounds` override per session.
 
 ## Events
 
@@ -27,10 +38,14 @@ No build step and no runtime dependencies: Pi loads the TypeScript entry point d
 
 ## Installation
 
-Install from git:
-
 ```sh
 pi install git:github.com/TolyanL/pi-sounds
+```
+
+Pin a tag or commit:
+
+```sh
+pi install git:github.com/TolyanL/pi-sounds@v0.1.0
 ```
 
 Try it for a single invocation without touching your settings:
@@ -46,7 +61,24 @@ git clone https://github.com/TolyanL/pi-sounds
 pi install ./pi-sounds
 ```
 
-The package is also `npm`-shaped (`keywords: ["pi-package"]`). If you publish it, `pi install npm:pi-sounds` works the same way.
+Restart Pi, or run `/reload`, after changing the extension. The package is `npm`-shaped (`keywords: ["pi-package"]`), so `pi install npm:pi-sounds` works the same way if you publish it.
+
+## Usage
+
+```sh
+pi                 # start Pi
+pi --no-sounds     # start with sounds disabled
+```
+
+Inside Pi:
+
+```text
+/sounds            # print current state: on/off, player, lead-in, config file in use
+/sounds on         # enable sounds for this session
+/sounds off        # disable sounds for this session
+```
+
+`/sounds on` and `/sounds off` store their state in the session, so it survives `/resume` and `/reload`.
 
 ## Sound files
 
@@ -105,7 +137,7 @@ Missing or malformed files are ignored with a one-line warning; built-in default
 }
 ```
 
-The same file lives in [`examples/sounds.json`](examples/sounds.json).
+[`examples/sounds.json`](examples/sounds.json) is a ready-to-copy version that additionally turns on `stopPrevious` and subscribes to the rpiv questionnaire channel.
 
 ### Top-level options
 
@@ -185,12 +217,6 @@ With `leadInMs: "auto"`, Pi queries the default sink via `pactl get-default-sink
 
 Set a positive number to force a lead-in, or `0` to disable it.
 
-## Commands and flags
-
-- `/sounds on` / `/sounds off` — toggle sounds for the current session. The state is stored in the session, so it survives `/resume` and `/reload`.
-- `/sounds` — print the current state: on/off, resolved player, lead-in, and the config file in use.
-- `pi --no-sounds` — start with sounds disabled.
-
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -200,6 +226,12 @@ Set a positive number to force a lead-in, or `0` to disable it.
 | Sound is clipped at the start | Bluetooth sink; keep `leadInMs: "auto"` and install `ffmpeg`. |
 | Sounds overlap or cut each other | Set `stopPrevious: true`, or raise `cooldownMs`. |
 | Question sound never fires | Add your questionnaire's tool name to `question.tools`, or its channel to `question.eventChannels`. |
+
+## Limitations
+
+- Sounds are fired per event, not per message: a long run with several tool calls is still one `done`.
+- Only the session toggle is persisted by the extension; the player, volume, and per-event rules come from the config file.
+- The Bluetooth lead-in depends on `pactl` and `ffmpeg`; without either, the original file is played unchanged.
 
 ## Development
 
